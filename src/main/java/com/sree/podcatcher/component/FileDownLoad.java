@@ -40,10 +40,13 @@ public class FileDownLoad implements DownLoad {
 
     @Override
     public Boolean call() throws DownLoadException {
-        boolean success = false;
         String fileName = url.toString().substring(url.toString().lastIndexOf("/") + 1);
         try {
             File file = new File(location, fileName);
+            if (file.exists()){
+               logger.debug("File allready exists: "+ file);
+               return true;
+            }
             file.createNewFile();
             try (FileOutputStream fileoutput = new FileOutputStream(file); InputStream inputStream = url.openStream();) {
                 int len;
@@ -54,12 +57,11 @@ public class FileDownLoad implements DownLoad {
                     Arrays.fill(b, (byte) 0);
                 }
             }
-            success = true;
         } catch (Exception e) {
             logger.error("Unable process the file download :", e);
             throw new DownLoadException("Unavilable to download file and write file into file system");
         }
-        return success;
+        return true;
     }
 
 }
